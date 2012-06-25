@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.vocabulary.DC_11;
 
 /**
@@ -18,6 +19,9 @@ import com.hp.hpl.jena.vocabulary.DC_11;
 public class PubsQuerier {
     
     private static final Logger log = Logger.getLogger(PubsQuerier.class.getName());
+
+    private static final String ASCENDING = "ASC";
+    private static final String DESCENDING = "DESC";
 
     private String graphURI;
     private String sparqlEndPointURL;
@@ -66,6 +70,15 @@ public class PubsQuerier {
         return performDescribeQuery(selectQuery);
     }
 
+    public String articles(int offset, int limit, Property orderProperty, String direction) {
+        String selectQuery =
+                "SELECT ?r WHERE { ?r a <"+SWRC.Article+"> . \n"+
+                "   ?r <"+orderProperty+"> ?d } \n"+
+                "   ORDER BY "+direction+"(?d) \n"+
+                "   LIMIT "+limit+" OFFSET "+offset;
+        return performDescribeQuery(selectQuery);
+    }
+
     private String byCreator(String authorURI, int limit) {
         return byCreator(authorURI, 0, limit);
     }
@@ -94,6 +107,10 @@ public class PubsQuerier {
 
         System.out.println("3 first Publications by R. Gil");
         System.out.println(q.byCreator("http://griho.udl.cat/person/GilR/", 3));
+        System.out.println();
+
+        System.out.println("10 oldest articles");
+        System.out.println(q.articles(0, 10, DC_11.date, PubsQuerier.ASCENDING));
         System.out.println();
     }
 }
