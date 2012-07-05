@@ -70,23 +70,19 @@ public class PubsQuerier {
                         "   "+selectQuery + " } }";
         return query(describeQuery, PubsQuerier.RDF);
     }
-    private String performSelectQuery(String selectQuery) {
-        String describeQuery =
-                "DESCRIBE ?r           \n" +
-                        "WHERE { ?r a ?type {  \n" +
-                        "   "+selectQuery + " } }";
-        return query(describeQuery, PubsQuerier.XML);
-    }
 
     public String articles(int limit) {
         return articles(0, limit, DC_11.date, PubsQuerier.ASCENDING);
     }
+
     public String articles(int offset, int limit) {
         return articles(offset, limit, DC_11.date, PubsQuerier.ASCENDING);
     }
+
     public String articles(int limit, Property orderProperty, String direction) {
         return articles(0, limit, DC_11.date, direction);
     }
+
     public String articles(int offset, int limit, Property orderProperty, String direction) {
         String selectQuery =
                 "SELECT ?r WHERE { ?r a <"+SWRC.Article+"> . \n"+
@@ -95,6 +91,7 @@ public class PubsQuerier {
                         "   LIMIT "+limit+" OFFSET "+offset;
         return performDescribeQuery(selectQuery);
     }
+
     public String listArticles(int offset, int limit, String direction) {
         String selectQuery =
                 "SELECT ?id ?authors ?title ?journal ?pages ?date \n"+
@@ -106,7 +103,7 @@ public class PubsQuerier {
                         "   ?id <"+DC_11.date+"> ?date }                \n"+
                         "   ORDER BY "+direction+"(?date)               \n"+
                         "   LIMIT "+limit+" OFFSET "+offset;
-        return performSelectQuery(selectQuery);
+        return query(selectQuery, PubsQuerier.XML);
     }
 
     public String byCreator(String authorURI, int limit) {
@@ -126,7 +123,7 @@ public class PubsQuerier {
     }
     public String byCreator(String authorURI, int offset, int limit, Property orderProperty, String direction) {
         String selectQuery =
-                "SELECT ?r WHERE { ?r <"+ DC_11.creator+"> <"+authorURI+"> } \n"+
+                "SELECT ?r WHERE { ?r <"+ DC_11.creator+"> <"+authorURI+"> . \n"+
                         "   ?r <"+orderProperty+"> ?d } \n"+
                         "   ORDER BY "+direction+"(?d) \n"+
                         "   LIMIT "+limit+" OFFSET "+offset;
